@@ -1,23 +1,52 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect } from "react";
+import Ispis from "./Ispis";
 
 function App() {
+
+  const [inputValue, setInputValue] = useState("");
+
+  const handleInputValue = (event) => {
+    setInputValue(event.target.value);
+  }
+
+  const [userValue, setUserValue] = useState([]);
+
+  useEffect(() => {
+    fetch(`https://api.github.com/users/facebook`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setUserValue(data);
+      })
+  }, []); 
+
+  const [listRepos, setListRepos] = useState();
+  useEffect(() => {
+    fetch(`https://api.github.com/users/facebook/repos`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setListRepos(data);
+      })
+  }, []); 
+
+  const handleReset = () => {
+    setInputValue([]);
+    setListRepos([]);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <form>
+        <label>GitHub username:</label>
+        <input type="text" onChange={handleInputValue} value={inputValue}/>
+        <button type="submit">GO!</button>
+        {listRepos && <Ispis 
+          userValue={userValue} 
+          listRepos={listRepos} 
+          handleReset={handleReset}       
+        /> }
+      </form>
     </div>
   );
 }
